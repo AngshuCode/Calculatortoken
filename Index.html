@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="bn"> <!-- Set language to Bengali -->
+<head>
+    <meta charset="UTF-8"> <!-- Essential for Bengali characters -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>এআই টোকেন বিদ্যুৎ খরচ অনুমানকারী</title> <!-- Translated Title -->
+
+    <!-- Google Font Link for Anek Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@100..800&display=swap" rel="stylesheet">
+    <!-- End Google Font Link -->
+
+    <!-- Embedded CSS -->
+    <style>
+        /* Apply Anek Bangla font */
+        body {
+            font-family: "Anek Bangla", sans-serif; /* Use Anek Bangla */
+            font-optical-sizing: auto; /* Enable optical sizing */
+            font-weight: 400; /* Set default weight to regular */
+            line-height: 1.7; /* Slightly increased line-height often helps Bangla readability */
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Use a bolder weight for headings */
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 700; /* Bold weight */
+        }
+
+        .disclaimer {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            text-align: center;
+            /* font-weight: 500; */ /* Example: Use medium weight if desired */
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        /* Use a slightly bolder weight for labels */
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600; /* Semi-bold weight for labels */
+            color: #555;
+        }
+
+        /* Ensure inputs use the font */
+        .input-group input[type="number"],
+        .input-group input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 120px;
+            margin-right: 5px;
+            font-family: "Anek Bangla", sans-serif; /* Explicitly set font for inputs */
+            font-optical-sizing: auto;
+            font-size: 1em;
+            font-weight: 400; /* Regular weight for input text */
+        }
+
+        .input-group input[type="text"]#currency {
+            width: 30px;
+            text-align: center;
+        }
+
+        .input-group span {
+            margin-left: 5px;
+            color: #666;
+        }
+
+        .input-group small {
+            display: block;
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 3px;
+            /* font-weight: 300; */ /* Example: Use lighter weight if desired */
+        }
+
+        .input-group .currency-symbol {
+            display: inline-block;
+            padding: 10px 5px 10px 10px;
+            border: 1px solid #ccc;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            background-color: #eee;
+            vertical-align: middle;
+            margin-right: -5px;
+            position: relative;
+            z-index: 1;
+            font-size: 1em;
+            font-weight: 400; /* Regular weight */
+        }
+
+        .input-group input#costPerKwh {
+            border-radius: 0 4px 4px 0;
+            position: relative;
+            z-index: 0;
+        }
+
+        /* Use bold weight for the button */
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+            font-family: "Anek Bangla", sans-serif; /* Explicitly set font for button */
+            font-optical-sizing: auto;
+            font-weight: 700; /* Bold weight */
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Use a bolder weight for the result */
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #eafaf1;
+            border: 1px solid #b8e9c6;
+            border-radius: 4px;
+            font-size: 1.2em;
+            font-weight: 600; /* Semi-bold weight for result */
+            text-align: center;
+            color: #1d643b;
+        }
+
+        .assumptions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .assumptions h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700; /* Bold weight */
+        }
+
+        .assumptions ol {
+            margin-left: 20px;
+            /* font-weight: 400; */ /* Already inherited from body */
+        }
+
+        /* Keep code tags monospace */
+        .assumptions code {
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace; /* Override Anek Bangla for code */
+            font-optical-sizing: none; /* Disable optical sizing for monospace */
+            font-weight: normal; /* Use normal monospace weight */
+        }
+    </style>
+    <!-- End Embedded CSS -->
+
+</head>
+<body>
+    <div class="container">
+        <h1>এআই টোকেন বিদ্যুৎ খরচ অনুমানকারী</h1> <!-- Translated Heading -->
+        <p class="disclaimer">
+            <strong>দাবিত্যাগ:</strong> এটি একটি আনুমানিক হিসাব। প্রকৃত শক্তি খরচ নির্দিষ্ট এআই মডেল, হার্ডওয়্যার, ডেটাসেন্টার দক্ষতা এবং আরও অনেক কিছুর উপর ভিত্তি করে উল্লেখযোগ্যভাবে পরিবর্তিত হয়।
+        </p> <!-- Translated Disclaimer -->
+
+        <div class="input-group">
+            <label for="tokens">টোকেনের সংখ্যা (মিলিয়নে):</label> <!-- Translated Label -->
+            <input type="number" id="tokens" value="1" min="0" step="0.1">
+            <span> মিলিয়ন টোকেন</span> <!-- Translated Unit -->
+        </div>
+
+        <div class="input-group">
+            <label for="kwhPerMillionTokens">প্রতি মিলিয়ন টোকেনের আনুমানিক kWh:</label> <!-- Translated Label -->
+            <input type="number" id="kwhPerMillionTokens" value="0.04" min="0" step="0.001">
+            <span> kWh / মিলিয়ন টোকেন</span> <!-- Translated Unit -->
+            <small> (এটি একটি গুরুত্বপূর্ণ অনুমান - গবেষণা প্রয়োজন! 0.04 একটি স্থানধারক।)</small> <!-- Translated Note -->
+        </div>
+
+        <div class="input-group">
+            <label for="costPerKwh">প্রতি kWh বিদ্যুতের দাম:</label> <!-- Translated Label -->
+            <span class="currency-symbol">$</span> <!-- Currency symbol (dynamic via JS) -->
+            <input type="number" id="costPerKwh" value="0.15" min="0" step="0.01">
+             <label for="currency" style="margin-left: 10px;">মুদ্রা:</label> <!-- Translated Label -->
+             <input type="text" id="currency" value="$" size="2"> <!-- Input for currency symbol -->
+        </div>
+
+        <button id="calculateBtn">আনুমানিক খরচ গণনা করুন</button> <!-- Translated Button Text -->
+
+        <div id="result" class="result">
+            আনুমানিক বিদ্যুৎ খরচ: --- <!-- Translated Default Result Text (will be updated by JS) -->
+        </div>
+
+         <div class="assumptions">
+            <h2>কিভাবে কাজ করে এবং অনুমানসমূহ</h2> <!-- Translated Section Title -->
+            <ol>
+                <li>প্রসেস করা মোট টোকেনের সংখ্যা (মিলিয়নে) লিখুন।</li> <!-- Translated Step 1 -->
+                <li>আপনি যে নির্দিষ্ট এআই মডেল এবং হার্ডওয়্যার সেটআপ বিবেচনা করছেন তার জন্য <strong>এক মিলিয়ন</strong> টোকেন প্রসেস করতে কত কিলোওয়াট-ঘন্টা (kWh) খরচ হয় তার সেরা অনুমান লিখুন। এই মানটি অত্যন্ত অনিশ্চিত।</li> <!-- Translated Step 2 -->
+                <li>আপনার লক্ষ্য মুদ্রায় প্রতি kWh বিদ্যুতের দাম লিখুন (এটি অবস্থান অনুসারে ব্যাপকভাবে পরিবর্তিত হয়)।</li> <!-- Translated Step 3 -->
+                <li>টুলটি গণনা করে: <br> <!-- Translated Explanation -->
+                    <code>মোট kWh = (মিলিয়নে টোকেন) * (প্রতি মিলিয়ন টোকেনে kWh)</code> <br> <!-- Formula Explanation -->
+                    <code>মোট খরচ = মোট kWh * প্রতি kWh দাম</code> <!-- Formula Explanation -->
+                </li>
+            </ol>
+            <p>মনে রাখবেন, এটি শীতলীকরণ ওভারহেড (যদি kWh/টোকেন অনুমানে PUE অন্তর্ভুক্ত করা হয় তবে আংশিকভাবে কভার করা হয়), নেটওয়ার্ক পরিকাঠামো এবং হার্ডওয়্যার তৈরিতে অন্তর্ভুক্ত শক্তির জন্য শক্তি উপেক্ষা করে।</p> <!-- Translated Final Note -->
+        </div>
+    </div>
+
+    <!-- Embedded JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tokensInput = document.getElementById('tokens');
+            const kwhPerMillionTokensInput = document.getElementById('kwhPerMillionTokens');
+            const costPerKwhInput = document.getElementById('costPerKwh');
+            const currencyInput = document.getElementById('currency');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultDiv = document.getElementById('result');
+            const currencySymbolSpan = document.querySelector('.currency-symbol');
+
+            // Update currency symbol display when input changes
+            currencyInput.addEventListener('input', () => {
+                currencySymbolSpan.textContent = currencyInput.value || '$'; // Default to $ if empty
+            });
+
+            calculateBtn.addEventListener('click', calculateCost);
+
+            // Optional: Calculate automatically when inputs change
+            // tokensInput.addEventListener('input', calculateCost);
+            // kwhPerMillionTokensInput.addEventListener('input', calculateCost);
+            // costPerKwhInput.addEventListener('input', calculateCost);
+            // currencyInput.addEventListener('input', calculateCost); // Currency symbol change also triggers recalculation
+
+            function calculateCost() {
+                // --- Get values and convert to numbers ---
+                const tokensMillions = parseFloat(tokensInput.value);
+                const kwhPerMillion = parseFloat(kwhPerMillionTokensInput.value);
+                const costPerKwh = parseFloat(costPerKwhInput.value);
+                const currencySymbol = currencyInput.value || '$'; // Use default if empty
+
+                // --- Validate inputs ---
+                if (isNaN(tokensMillions) || tokensMillions < 0 ||
+                    isNaN(kwhPerMillion) || kwhPerMillion < 0 ||
+                    isNaN(costPerKwh) || costPerKwh < 0) {
+                    // Translated Error Message:
+                    resultDiv.textContent = 'অনুগ্রহ করে সমস্ত ক্ষেত্রে সঠিক ধনাত্মক সংখ্যা লিখুন।';
+                    resultDiv.style.color = '#d9534f'; // Error color
+                    resultDiv.style.borderColor = '#d9534f';
+                    resultDiv.style.backgroundColor = '#f2dede';
+                    return; // Stop calculation
+                }
+
+                // --- Perform calculation ---
+                const totalKwh = tokensMillions * kwhPerMillion;
+                const totalCost = totalKwh * costPerKwh;
+
+                // --- Format the result ---
+                // Show more decimal places for potentially very small costs
+                let decimalPlaces = totalCost < 0.01 && totalCost !== 0 ? 6 : 4; // Show more decimals if cost is very low but not zero
+                if (totalCost === 0) decimalPlaces = 2; // Avoid showing 0.000000 for zero cost
+
+                const formattedCost = totalCost.toFixed(decimalPlaces); // Using standard numerals
+
+                // --- Display result ---
+                // Translated Result Prefix:
+                resultDiv.innerHTML = `আনুমানিক বিদ্যুৎ খরচ: ${currencySymbol}${formattedCost}`;
+                resultDiv.style.color = '#1d643b'; // Success color
+                resultDiv.style.borderColor = '#b8e9c6';
+                resultDiv.style.backgroundColor = '#eafaf1';
+            }
+
+            // Initial calculation on page load
+            calculateCost();
+        });
+    </script>
+    <!-- End Embedded JavaScript -->
+
+</body>
+                  </html>
